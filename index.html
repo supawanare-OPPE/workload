@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบสรุปฐานข้อมูลภาระงาน | นางสาวศุภวรรณ อารีจิตรานุสรณ์</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231E3A5F'/%3E%3Cstop offset='100%25' stop-color='%232563EB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700' font-size='26'%3EAR%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="เมนูประเภทงานตามชีท">
+      <div class="sidebar-brand">
+        <div class="brand-mark">AR</div>
+        <div class="brand-text">
+          <h1>ฐานข้อมูลภาระงาน</h1>
+          <p>Live Google Sheets Sync</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="navList"></nav>
+
+      <div class="sidebar-footer">
+        <div>ข้อมูลซิงค์อัตโนมัติจาก Google Sheet</div>
+        <div style="margin-top:2px;">หน่วยสถาปัตยกรรมและผังแม่บท</div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+    <!-- Workspace -->
+    <div class="workspace">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle" id="menuToggle" aria-label="เปิดเมนู">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button type="button" class="profile-avatar-btn" id="profileAvatarBtn" title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์">
+            <img id="profileAvatarImg" class="profile-avatar-img" src="./profile.jpg" alt="นางสาวศุภวรรณ อารีจิตรานุสรณ์" />
+            <span id="profileAvatarFallback" class="profile-avatar-fallback" hidden>ศอ</span>
+            <span class="profile-avatar-badge" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </span>
+          </button>
+          <div class="profile-summary">
+            <div class="profile-name">
+              <span>นางสาวศุภวรรณ อารีจิตรานุสรณ์</span>
+              <span class="role-pill">สถาปนิก (ผู้ชำนาญการพิเศษ)</span>
+            </div>
+            <div class="profile-unit">หัวหน้าหน่วยสถาปัตยกรรมและผังแม่บท • กองกายภาพและสิ่งแวดล้อม</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="sync-pill" title="สถานะการเชื่อมต่อ Google Sheet">
+            <span class="sync-dot" id="syncDot"></span>
+            <span id="syncStatusText">กำลังเตรียมเชื่อมต่อ...</span>
+          </div>
+
+          <select class="select-sm" id="autoRefreshSelect" title="ตั้งเวลาอัปเดตอัตโนมัติ">
+            <option value="0">รีเฟรช: กดเอง</option>
+            <option value="60000">อัปเดตทุก 1 นาที</option>
+            <option value="300000">อัปเดตทุก 5 นาที</option>
+          </select>
+
+          <button type="button" class="btn btn-primary btn-sm" id="syncBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            อัปเดตข้อมูล
+          </button>
+
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" id="openSheetLink">
+            Google Sheet ↗
+          </a>
+
+          <button type="button" class="btn btn-outline btn-sm" id="printBtn" title="พิมพ์รายงานสรุป / Save PDF">
+            พิมพ์รายงาน
+          </button>
+
+          <button type="button" class="btn btn-ghost btn-sm" id="settingsBtn" title="ตั้งค่าลิงก์ชีทและรายการแท็บ">
+            ตั้งค่าชีท
+          </button>
+        </div>
+      </header>
+
+      <!-- Global Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-pills" id="paFilterPills"></div>
+
+        <div class="filter-controls">
+          <select class="select-sm" id="statusFilterSelect" aria-label="กรองตามสถานะ">
+            <option value="ALL">สถานะ: ทั้งหมด</option>
+            <option value="completed">แล้วเสร็จ / เข้าร่วม</option>
+            <option value="in_progress">กำลังดำเนินการ</option>
+            <option value="not_started">ยังไม่ดำเนินการ</option>
+            <option value="cancelled">ยกเลิก / ชะลอ / หยุดงาน</option>
+            <option value="not_attended">ไม่ได้เข้าร่วม</option>
+          </select>
+
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ค้นหาชื่องาน, หน่วยงาน, หมายเหตุ..." />
+            <button type="button" class="clear-search-btn" id="clearSearchBtn" hidden title="ล้างคำค้น">✕</button>
+          </div>
+
+          <button type="button" class="btn btn-ghost btn-sm" id="resetFiltersBtn">ล้างตัวกรอง</button>
+        </div>
+      </div>
+
+      <div class="error-banner" id="errorBanner" hidden></div>
+
+      <!-- Dynamic Dashboard Workspace -->
+      <main class="main-content" id="mainContent"></main>
+    </div>
+  </div>
+
+  <!-- Row Detail Modal -->
+  <div class="modal-overlay" id="detailModal" hidden role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge" id="detailModalSheetBadge"></span>
+          <h3 id="detailModalTitle">รายละเอียดงาน</h3>
+        </div>
+        <button type="button" class="modal-close" id="detailModalClose" aria-label="ปิด">✕</button>
+      </div>
+      <div class="modal-body" id="detailModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" hidden role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge" style="background:#eff6ff;color:#1d4ed8;">การเชื่อมต่อฐานข้อมูล</span>
+          <h3 id="settingsModalTitle">ตั้งค่า Google Sheet และชีทงาน</h3>
+        </div>
+        <button type="button" class="modal-close" id="settingsClose" aria-label="ปิด">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group profile-settings-box">
+          <label>รูปโปรไฟล์ผู้รับผิดชอบ (แสดงบนแถบหัวเว็บ)</label>
+          <div class="profile-settings-row">
+            <div class="profile-preview-box">
+              <img id="settingsAvatarPreview" class="profile-avatar-img" alt="ตัวอย่างรูปโปรไฟล์" hidden />
+              <span id="settingsAvatarFallback" class="profile-avatar-fallback">ศอ</span>
+            </div>
+            <div class="profile-settings-controls">
+              <input type="text" id="profileImageUrlInput" class="input-full" placeholder="วางลิงก์รูปภาพ, ลิงก์ Google Drive หรือ ./profile.jpg" />
+              <div class="profile-upload-actions">
+                <label class="btn btn-outline btn-sm upload-label">
+                  เลือกรูปจากเครื่อง
+                  <input type="file" id="profileFileInput" accept="image/*" hidden />
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" id="clearProfileImageBtn">ลบรูป / ใช้ตัวย่อ</button>
+              </div>
+              <small class="help-text">สำหรับการอัปโหลดขึ้น GitHub: แนะนำให้วางไฟล์ชื่อ <code>profile.jpg</code> หรือ <code>profile.png</code> ไว้ในโฟลเดอร์เดียวกับ <code>index.html</code> เพื่อให้ทุกคนที่เปิดลิงก์เห็นรูปทันที</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sheetIdInput">ลิงก์ Google Sheet หรือ Spreadsheet ID</label>
+          <input type="text" id="sheetIdInput" class="input-full" placeholder="https://docs.google.com/spreadsheets/d/..." />
+        </div>
+
+        <div class="form-group">
+          <label>รายการชีทที่เชื่อมต่อ (สามารถเพิ่มแท็บใหม่จาก GID ใน URL ของแต่ละชีทได้)</label>
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>ชื่อชีท</th>
+                <th style="width:130px;">GID</th>
+                <th style="width:210px;">หมวดหมู่ในเมนู</th>
+                <th style="width:44px;"></th>
+              </tr>
+            </thead>
+            <tbody id="sheetsEditorBody"></tbody>
+          </table>
+          <button type="button" class="btn btn-outline btn-sm" id="addSheetRowBtn">+ เพิ่มชีท</button>
+        </div>
+
+        <div class="settings-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="resetDefaultSheetsBtn">คืนค่าเริ่มต้น (10 ชีท)</button>
+          <button type="button" class="btn btn-primary" id="saveSettingsBtn">บันทึกและซิงค์ข้อมูลใหม่</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./sheets-config.js"></script>
+  <script src="./data-engine.js"></script>
+  <script src="./charts.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
